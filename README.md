@@ -1,6 +1,6 @@
 # py-wsi
 
-This is a Python library for dealing with whole slide images (WSI), or Aperio .svs files for deep learning, using OpenSlide.
+This is a Python library for dealing with whole slide images (WSI), or Aperio .svs files for deep learning, using OpenSlide. py-wsi provides functions to perform patch sampling from .svs files, generation of metadata, and saving to either a Lightning memory-mapped database (LMDB), HDF5 files, or to disk.
 
 According to the (Python OpenSlide website)[http://openslide.org/api/python/], OpenSlide is a C library that provides a simple interface for reading whole-slide images, also known as virtual slides, which are high-resolution images used in digital pathology. These images can occupy tens of gigabytes when uncompressed, and so cannot be easily read using standard tools or libraries, which are designed for images that can be comfortably uncompressed into RAM. Whole-slide images are typically multi-resolution; OpenSlide allows reading a small amount of image data at the resolution closest to a desired zoom level.
 
