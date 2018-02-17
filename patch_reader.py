@@ -56,23 +56,26 @@ def sample_patches(file_name,
 	count = 0
 	while y < y_tiles:
 		while x < x_tiles:
-			patches.append(np.array(tiles.get_tile(level, (x, y))))
-			coords.append(np.array([x, y]))
-			count += 1
-			x += 0
+			new_tile = np.array(tiles.get_tile(level, (x, y)), dtype=np.int)
+			# OpenSlide calculates overlap in such a way that sometimes depending on the dimensions, edge 
+			# patches are smaller than the others. We will ignore such patches.
+			if np.shape(new_tile) == (patch_size, patch_size, 3):
+				patches.append(new_tile)
+				coords.append(np.array([x, y]))
+				count += 1
+			x += 1
 		y += 1
 		x = 0
 
 	image_ids = [im_id]*count
-	print(np.shape(np.array(patches)))
-	return np.array(patches), np.array(coords), np.array(image_ids)
-
+	return patches, np.array(coords), np.array(image_ids)
 
 def main():
 	
-	sample_patches(example_file, example_dir, patch_size=512, percent_overlap=0.5, level=13)
-
-
+	patches, coords, ids = sample_patches(example_file, example_dir, patch_size=256, percent_overlap=0.5, level=12)
+	print(np.shape(patches))
+	print(np.shape(coords))
+	print(np.shape(ids))
 
 if __name__ == "__main__":
     main()
