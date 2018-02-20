@@ -10,9 +10,6 @@ import pickle
 import patch_reader as pr
 import numpy as np
 
-example_file = "04.svs"
-example_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI/"
-
 
 class Item(object):
 

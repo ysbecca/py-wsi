@@ -15,7 +15,7 @@ from item import *
 
 # OPTION 1) Store in a lightning memory-mapped database.
 
-def save_in_lmdb(env, patches, coords, ids, labels=[]):
+def save_in_lmdb(env, patches, coords, ids, file_name, labels=[]):
 	use_label = False
 	if len(labels) > 0:
 		use_label = True
@@ -28,7 +28,7 @@ def save_in_lmdb(env, patches, coords, ids, labels=[]):
 			else:
 				item = Item(patches[i], ids[i], coords[i], 0)
 
-			str_id = example_file + '-' + str(coords[i][0]) + '-' + str(coords[i][1])
+			str_id = file_name + '-' + str(coords[i][0]) + '-' + str(coords[i][1])
 			txn.put(str_id.encode('ascii'), pickle.dumps(item))
 
 
