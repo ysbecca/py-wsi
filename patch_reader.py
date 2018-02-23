@@ -12,14 +12,11 @@ from openslide import open_slide
 from openslide.deepzoom import DeepZoomGenerator
 from glob import glob
 
-# example_file = "04.svs"
-# example_dir = "/Users/ysbecca/ysbecca-projects/iciar-2018/data/WSI/"
-
 
 def sample_patches(file_name,
 				   file_dir,
+				   percent_overlap,
 				   patch_size=512,
-				   percent_overlap=0.5,
 				   level=0,
 				   image_id=False,
 				   ):
@@ -38,8 +35,6 @@ def sample_patches(file_name,
 
 	overlap = int(patch_size*percent_overlap / 2.0)
 	tile_size = patch_size - overlap*2
-	# print("Overlap pixels: " + str(overlap))
-	# print("Tile size: " + str(tile_size))
 
 	slide = open_slide(file_dir + file_name) 
 	tiles = DeepZoomGenerator(slide, tile_size=tile_size, overlap=overlap, limit_bounds=False)
@@ -48,8 +43,6 @@ def sample_patches(file_name,
 		print("Error: requested level does not exist. Slide level count: " + str(tiles.level_count))
 		return
 	x_tiles, y_tiles = tiles.level_tiles[level]
-	# print("x_tiles: " + str(x_tiles))
-	# print("y_tiles: " + str(y_tiles))
 
 	patches, coords = [], []
 	x, y = 0, 0
@@ -68,24 +61,4 @@ def sample_patches(file_name,
 		x = 0
 
 	image_ids = [im_id]*count
-	return patches, np.array(coords), np.array(image_ids)
-
-# def main():
-	
-	# patches, coords, ids = sample_patches(example_file, example_dir, patch_size=256, percent_overlap=0.5, level=12)
-	# print(np.shape(patches))
-	# print(np.shape(coords))
-	# print(np.shape(ids))
-
-# if __name__ == "__main__":
-    # main()
-
-
-
-
-
-
-
-
-
-
+	return patches, np.array(coords), np.array(image_ids), (x_tiles, y_tiles)

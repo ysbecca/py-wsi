@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+wsi_data/*
+.DS_Store
+*.mdb
+patch_db*/*
+patch_db/*
+
 # Distribution / packaging
 *lmdb*
 .Python
