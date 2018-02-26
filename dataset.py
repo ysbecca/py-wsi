@@ -15,7 +15,7 @@ import random
 
 class DataSet(object):
 
-  def __init__(self, images, labels, image_cls, ids, coords):
+  def __init__(self, images, labels, image_cls, coords):
 
     self._num_images = np.array(images).shape[0]
     self._images = images
@@ -25,7 +25,7 @@ class DataSet(object):
     # The source image labels
     self._image_cls = image_cls
     # Integer labels
-    self._ids = ids 
+    # self._ids = ids 
     self._coords = coords
 
     self._epochs_completed = 0
@@ -47,9 +47,9 @@ class DataSet(object):
   def num_images(self):
     return self._num_images
 
-  @property
-  def ids(self):
-    return self._ids
+  # @property
+  # def ids(self):
+    # return self._ids
 
   @property
   def set_id(self):
@@ -73,9 +73,9 @@ class DataSet(object):
 
   # Shuffles all patches in the dataset object.
   def shuffle_all(self):
-  	list_all = list(zip(self._images, self._labels, self._image_cls, self._ids, self._coords))
+  	list_all = list(zip(self._images, self._labels, self._image_cls, self._coords))
   	random.shuffle(list_all)
-  	self._images, self._labels, self._image_cls, self._ids, self._coords = zip(*list_all)
+  	self._images, self._labels, self._image_cls, self._coords = zip(*list_all)
 
     # [self._images, self._labels, self._image_cls, self._ids, self._coords] = \
       # shuffle_multiple([self._images, self._labels, self._image_cls, self._ids, self._coords])
@@ -113,29 +113,28 @@ def shuffle_multiple(list_of_lists):
 
 def fetch_dataset(turtle, set_id, total_sets, augment):
 
-	if set_id > -1:
-		items = turtle.get_set_patches(set_id, total_sets)
+  if set_id > -1:
+    items = turtle.get_set_patches(set_id, total_sets)
 
-		patches = [i.get_patch() for i in items]
-		labels = [i.label for i in items]
-		image_ids = [i.image_id for i in items]
-		coords = [i.coords for i in items]
-		classes = [i.get_id() for i in items]
+    patches = [i.get_patch() for i in items]
+    coords = [i.coords for i in items]
+    classes = [i.label for i in items]
+    # label for the dataset now means array
+    labels = [i.get_label_array(len(turtle.label_map)) for i in items]
 
-		if augment:
-			orig = np.copy(patches)
-			if select_augment < 0:
-				for j in range(1, 9):
-					patches = np.concatenate((au.augment_patches(orig, j), patches), axis=0)
-				labels = np.tile(labels, (9, 1))
-				coords = np.tile(coords, (9, 1))
-				image_ids = np.tile(image_ids, 9)
-				classes = np.tile(classes, 9)
+    if augment:
+      orig = np.copy(patches)
+      if select_augment < 0:
+        for j in range(1, 9):
+          patches = np.concatenate((au.augment_patches(orig, j), patches), axis=0)
+        labels = np.tile(labels, (9, 1))
+        coords = np.tile(coords, (9, 1))
+        classes = np.tile(classes, 9)
 
-		return DataSet(patches, labels, classes, image_ids, coords)
-	else:
-		print("Not yet implemented test DB. Need to load all patches from every image from test turtle.")
-		return None
+    return DataSet(patches, labels, classes, coords)
+  else:
+    print("Not yet implemented test DB. Need to load all patches from every image from test turtle.")
+    return None
 
 def read_datasets(turtle,
 					set_id=-1,

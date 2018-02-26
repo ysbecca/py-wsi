@@ -15,7 +15,7 @@ from os.path import isfile, join
 import math
 import itertools
 
-# py-wsi helper scripts
+# py-wsi helper scripts.
 from patch_reader import *
 from store import *
 
@@ -32,13 +32,15 @@ def end_timer(start_time):
 # The py-wsi main class for manipulating svs and patches. Turtles are the best.
 class Turtle(object):
 
-	def __init__(self, file_dir, db_location, db_name):
+	def __init__(self, file_dir, db_location, db_name, label_map={}, xml_dir=False):
 		self.file_dir = file_dir
 		self.db_location = db_location
 		self.db_name = db_name
 		self.db_meta_name = self.__get_db_meta_name(db_name)
 		self.files = self.__get_files_from_dir(file_dir)
 		self.num_files = len(self.files)
+		self.xml_dir = xml_dir
+		self.label_map = label_map
 
 		print(str(self.num_files) + " WSI found in directory.")
 
@@ -77,10 +79,19 @@ class Turtle(object):
 	def __get_db_meta_name(self, db_name):
 		return db_name + "_meta"
 
+	def set_label_map(self, label_map):
+		self.label_map = label_map
+
 	def set_file_dir(self, file_dir):
 		self.file_dir = file_dir
 		self.files = self.__get_files_from_dir(file_dir)
 		self.num_files = len(self.files)
+
+	def set_xml_dir(self, xml_dir):
+		self.xml_dir = xml_dir
+
+	def get_xml_files(self):
+		return self.__get_files_from_dir(self.xml_dir)
 
 	def set_db_location(self, db_location):
 		self.db_location = db_location
@@ -89,7 +100,7 @@ class Turtle(object):
 		self.db_name = db_name
 		self.db_meta_name = self.__get_db_meta_name(db_name)
 
-	def sample_and_store_patches(self, patch_size, level, overlap, est_patches_per_svs=300):
+	def sample_and_store_patches(self, patch_size, level, overlap, load_xml=False, est_patches_per_svs=300):
 		start_time = start_timer()
 
 		# A rough, generous estimate of how many patches expected per image; can be adjusted if needed.
@@ -102,13 +113,25 @@ class Turtle(object):
 		env = new_lmdb(self.db_location, self.db_name, map_size_bytes)
 		meta_env = new_lmdb(self.db_location, self.db_meta_name, patches_expected*50)
 
+		xml_dir = False
+		if load_xml:
+			xml_dir = self.xml_dir
+
 		for file in self.files:
 			print(file, end=" ")
-			patches, coords, ids, tile_dims = sample_patches(file, self.file_dir, overlap, patch_size=patch_size, level=level)
+			patches, coords, tile_dims, labels = sample_patches(
+										file, 
+										self.file_dir, 
+										overlap, 
+										patch_size=patch_size, 
+										level=level,
+										xml_dir=xml_dir,
+										label_map=self.label_map)
+
 			patches = np.array(patches).astype(np.uint8)
 
 			# Write this file info to db in a single transaction.
-			save_in_lmdb(env, patches, coords, ids, file)
+			save_in_lmdb(env, patches, coords, file, labels)
 			save_meta_in_lmdb(meta_env, file, tile_dims)
 
 		print("")
