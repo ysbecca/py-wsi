@@ -11,7 +11,7 @@ from datetime import timedelta
 
 import lmdb
 import numpy as np
-from item import *
+from .item import *
 
 # OPTION 1) Store in a lightning memory-mapped database.
 

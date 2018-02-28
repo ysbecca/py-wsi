@@ -11,8 +11,8 @@ setup(name='py_wsi',
       install_requires=[
           'shapely',
           'numpy',
-          'openslide',
+          'openslide-python',
           'lmdb',
-          'PIL',
+          'Pillow',
       ],
       zip_safe=False)

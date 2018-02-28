@@ -7,7 +7,6 @@ Author: @ysbecca
 '''
 
 import numpy as np
-import openslide
 from openslide import open_slide  
 from openslide.deepzoom import DeepZoomGenerator
 from glob import glob

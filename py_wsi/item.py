@@ -7,7 +7,6 @@ Author: @ysbecca
 '''
 
 import pickle
-import patch_reader as pr
 import numpy as np
 from PIL import Image
 

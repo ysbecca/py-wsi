@@ -31,5 +31,5 @@ pip install py_wsi
 
 3. Check out Jupyter Notebook "Using py-wsi" to see what py-wsi can do and get started!
 
-*Feel free to contact me with any errors, additional functionality requests, and feedback.*
+**Feel free to contact me with any errors, additional functionality requests, and feedback.**
 
