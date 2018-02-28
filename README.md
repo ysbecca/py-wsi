@@ -17,13 +17,19 @@ numpy 1.12.1
 openslide-python 1.1.1
 
 
-1. Install openslide
+1. Check dependencies listed in setup.py; notably, openslide-python which requires openslide, and lmdb.
 
 ```
 brew install openslide
 ```
 
-2. Install Python dependencies
+2. Install py_wsi using pip.
+
+```
+pip install py_wsi
+```
+
 3. Check out Jupyter Notebook "Using py-wsi" to see what py-wsi can do and get started!
 
+*Feel free to contact me with any errors, additional functionality requests, and feedback.*
 
