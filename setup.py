@@ -13,7 +13,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='py_wsi',
-      version='0.2',
+      version='0.21',
       description=description,
       long_description=long_description,
       url='https://github.com/ysbecca/py-wsi',
