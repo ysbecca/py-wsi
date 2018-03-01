@@ -1,4 +1,5 @@
 from setuptools import setup
+from os import path
 
 description = """Python package for dealing with whole slide images (.svs) for machine learning, including
                 intuitive, painless patch sampling using OpenSlide, automatic labeling from ImageScope XML 
@@ -6,9 +7,15 @@ description = """Python package for dealing with whole slide images (.svs) for m
                 memory-mapped databases (LMDB) for quick reads.
             """
 
+here = path.abspath(path.dirname(__file__))
+
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(name='py_wsi',
-      version='0.1',
+      version='0.2',
       description=description,
+      long_description=long_description,
       url='https://github.com/ysbecca/py-wsi',
       author='Rebecca Stone',
       author_email='ysbecca@gmail.com',
@@ -21,4 +28,5 @@ setup(name='py_wsi',
           'lmdb',
           'Pillow',
       ],
+      keywords='whole slide images svs openslide lmdb machine learning', 
       zip_safe=False)
