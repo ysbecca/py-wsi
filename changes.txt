@@ -1,0 +1,3 @@
+0.1 initial release
+
+0.2 error-handling for cases when XML region name is not found in the provided label_map. Assigns labels by default to -1, prints error, and continues patch sampling and loading process.
