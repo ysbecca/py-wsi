@@ -8,6 +8,9 @@ py-wsi uses OpenSlide Python. According to the [Python OpenSlide website](http:/
 
 *Note: HDF5 functionality is currently on hold.*
 
+**Check [Jupyter Notebook on GitHub](https://github.com/ysbecca/py-wsi/blob/master/Using%20py-wsi.ipynb) to view example usage.**
+
+
 ## Setup
 
 This library is dependent on the following, (also included in requirements.txt) but may be compatible
