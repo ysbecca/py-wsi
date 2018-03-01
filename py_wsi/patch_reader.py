@@ -14,16 +14,29 @@ from xml.dom import minidom
 from shapely.geometry import Polygon, Point
 
 
+def check_label_exists(label, label_map):
+	if label in label_map:
+		return True
+	else:
+		print("py_wsi error: provided label " + str(label) + " not present in label map.")
+		print("Setting label as -1 for UNRECOGNISED LABEL.")
+		print(label_map)
+		return False
 
 def generate_label(regions, region_labels, point, label_map):
     # regions = array of vertices (all_coords)
     # point [x, y]
-    for i in range(len(region_labels)):
-        poly = Polygon(regions[i])
-        if poly.contains(Point(point[0], point[1])):
-            return label_map[region_labels[i]]
-    return label_map['Normal']
-
+	for i in range(len(region_labels)):
+		poly = Polygon(regions[i])
+		if poly.contains(Point(point[0], point[1])):
+			if check_label_exists(region_labels[i], label_map):
+				return label_map[region_labels[i]]
+			else:
+				return -1
+	if check_label_exists('Normal', label_map):
+		return label_map['Normal']
+	else:
+		return -1
 
 def get_regions(path):
 	''' Parses the xml at the given path, assuming annotation format importable by ImageScope. '''
