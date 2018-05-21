@@ -1,5 +1,17 @@
 # py-wsi
 
+##IMPORTANT NOTICE:
+
+I am currently working on an update to py_wsi which will add three major improvements which will be helpful in general, and particularly when dealing with much larger datasets:
+
+- better memory management
+- much better error checking and handling
+- functionality to allow for sampling test patches before sampling from all images
+
+I will also post a blog post on my blog (ysbecca.github.io) soon on understanding patch_size and tile level. The test patch sampling functionality should also be very helpful. **I would strongly suggest downloading the update when it is available, and I appreciate any feedback after that.**
+
+---------
+
 These Python functions deal with whole slide images (WSI), or Aperio .svs files for deep learning, using OpenSlide. py-wsi provides functions to perform patch sampling from .svs files, generation of metadata, and several store options: saving to a lightning memory-mapped database (LMDB), HDF5 files, or disk.
 
 Lim et al. in "[An analysis of image storage systems for scalable training of deep neural networks](http://www.bafst.com/events/asplos16/bpoe7/wp-content/uploads/analysis-image-storage.pdf)" perform a thorough evaluation of the best image storage systems, taking into consideration memory usage and access speed. LMDB, a B+tree based key-value storage, is not the most memory efficient, but provides optimal read time.
