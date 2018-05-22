@@ -4,13 +4,10 @@ py-wsi
 Current version
 ---------------
 
+**Notice: it is strongly recommended to use py-wsi version >= 1.0.**
+
 The current update to py_wsi has added three major improvements which
 are essential for dealing with very large datasets of .svs images:
-
--  better memory management
--  much better error checking and handling
--  functionality to allow for sampling test patches before sampling from
-   all images
 
 See this blog post `py_wsi for computer analysis on whole slide .svs
 images using OpenSlide <ysbecca.github.io>`__ for help on understanding
@@ -35,6 +32,12 @@ learning, using Python OpenSlide. py-wsi provides functions to perform
 patch sampling from .svs files, generation of metadata, and several
 store options: saving to a lightning memory-mapped database (LMDB), HDF5
 files, or disk.
+
+These Python functions deal with whole slide images (WSI), or Aperio
+.svs files for deep learning, using OpenSlide. py-wsi provides functions
+to perform patch sampling from .svs files, generation of metadata, and
+several store options: saving to a lightning memory-mapped database
+(LMDB), HDF5 files, or disk.
 
 Lim et al. in “`An analysis of image storage systems for scalable
 training of deep neural
