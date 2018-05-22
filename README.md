@@ -7,7 +7,11 @@
 
 The current update to py_wsi has added three major improvements which are essential for dealing with very large datasets of .svs images:
 
-See this blog post [py_wsi for computer analysis on whole slide .svs images using OpenSlide](ysbecca.github.io) for help on understanding the relationship between patch and tile sampling. The test patch sampling functionality in this version will also help users to know exactly what they are sampling. 
+- better memory management
+- error handling
+- functionality to allow for sampling test patches before sampling from all images
+
+See this blog post [py_wsi for computer analysis on whole slide .svs images using OpenSlide](https://ysbecca.github.io) for help on understanding the relationship between patch and tile sampling. The test patch sampling functionality in this version will also help users to know exactly what they are sampling. 
 
 For any early users who have downloaded previous versions of py_wsi (< 1.0) I would **strongly suggest downloading the update**. Please feel free to submit any issues to the GitHub repository and I will provide help as I am able to. 
 
