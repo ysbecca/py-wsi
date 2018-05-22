@@ -39,3 +39,5 @@ def show_labeled_patches(images, clss):
         plt.axis("off")
 
     plt.show()
+
+

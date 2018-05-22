@@ -13,6 +13,7 @@ from glob import glob
 from xml.dom import minidom
 from shapely.geometry import Polygon, Point
 
+from .store import *
 
 def check_label_exists(label, label_map):
 	if label in label_map:
@@ -63,47 +64,51 @@ def get_regions(path):
 		regions.append(coords)
 	return regions, region_labels
 
-def sample_patches(file_name,
-				   file_dir,
-				   percent_overlap,
-				   patch_size=512,
-				   level=0,
-				   image_id=False,
-				   xml_dir=False,
-				   label_map={}
-				   ):
-	''' Sample patches of specified size from .svs file.
-		- overlap: 0.5 is a 50% overlap; overlap = 0 means no overlap; overlap > 1.0 skips regions in 
-			proportion to size of tile
-		- level: 0 is highest resolution; level_count - 1 is lowest
-		
-		Returns arrays of patches, x,y coordinates, and parent image IDs (filename if not specified).
+def patch_to_tile_size(patch_size, overlap):
+	return patch_size - overlap*2
 
+def sample_and_store_patches_by_row(
+								file_name,
+								file_dir,
+								pixel_overlap,
+								env,
+								meta_env,
+								patch_size=512,
+								level=0,
+								image_id=False,
+								xml_dir=False,
+								label_map={},
+								limit_bounds=True,
+								rows_per_txn=20,
+				   				):
+	''' Sample patches of specified size from .svs file.
+		- pixel_overlap: pixels overlap on each side
+		- level: 0 is lowest resolution; level_count - 1 is highest
+		
 		Note: patch_size is the dimension of the sampled patches, NOT equivalent to openslide's definition
 		of tile_size. This implementation was chosen to allow for more intuitive usage.
 	'''
 	
-	overlap = int(patch_size*percent_overlap / 2.0)
-	tile_size = patch_size - overlap*2
+	tile_size = patch_to_tile_size(patch_size, pixel_overlap)
 
 	slide = open_slide(file_dir + file_name) 
-	tiles = DeepZoomGenerator(slide, tile_size=tile_size, overlap=overlap, limit_bounds=False)
+	tiles = DeepZoomGenerator(slide, tile_size=tile_size, overlap=pixel_overlap, limit_bounds=limit_bounds)
 
 	if xml_dir:
 		# Expect filename of XML annotations to match SVS file name
 		regions, region_labels = get_regions(xml_dir + file_name[:-4] + ".xml")
 
 	if level >= tiles.level_count:
-		print("Error: requested level does not exist. Slide level count: " + str(tiles.level_count))
-		return
+		print("[py-wsi error]: requested level does not exist. Number of slide levels: " + str(tiles.level_count))
+		return 0
 	x_tiles, y_tiles = tiles.level_tiles[level]
 
-	patches, coords, labels = [], [], []
 	x, y = 0, 0
-	count = 0
+	count, batch_count = 0, 0
+	patches, coords, labels = [], [], []
 	while y < y_tiles:
 		while x < x_tiles:
-			new_tile = np.array(tiles.get_tile(level, (x, y)), dtype=np.int)
+			new_tile = np.array(tiles.get_tile(level, (x, y)), dtype=np.uint8)
 			# OpenSlide calculates overlap in such a way that sometimes depending on the dimensions, edge 
 			# patches are smaller than the others. We will ignore such patches.
 			if np.shape(new_tile) == (patch_size, patch_size, 3):
@@ -116,8 +121,15 @@ def sample_patches(file_name,
 					converted_coords = tiles.get_tile_coordinates(level, (x, y))[0]
 					labels.append(generate_label(regions, region_labels, converted_coords, label_map))
 			x += 1
+		
+		# To save memory, we will save data into the dbs every rows_per_txn rows. i.e., each transaction will commit
+		# rows_per_txn rows of patches. Write after last row regardless.
+		if (y % rows_per_txn == 0 and y != 0) or y == y_tiles-1:
+			save_in_lmdb(env, patches, coords, file_name[:-4], labels)
+			save_meta_in_lmdb(meta_env, file_name[:-4], [x_tiles, y_tiles])
+			patches, coords, labels = [], [], [] # Reset right away.
+
 		y += 1
 		x = 0
 
-	return patches, np.array(coords), (x_tiles, y_tiles), np.array(labels)
-
+	return count

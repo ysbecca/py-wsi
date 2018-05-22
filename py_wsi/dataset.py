@@ -73,9 +73,13 @@ class DataSet(object):
 
   # Shuffles all patches in the dataset object.
   def shuffle_all(self):
-  	list_all = list(zip(self._images, self._labels, self._image_cls, self._coords))
-  	random.shuffle(list_all)
-  	self._images, self._labels, self._image_cls, self._coords = zip(*list_all)
+    if self.num_images <= 1:
+        print("Cannot shuffle when", self.num_images, "images in set.")
+        return
+
+    list_all = list(zip(self._images, self._labels, self._image_cls, self._coords))
+    random.shuffle(list_all)
+    self._images, self._labels, self._image_cls, self._coords = zip(*list_all)
 
     # [self._images, self._labels, self._image_cls, self._ids, self._coords] = \
       # shuffle_multiple([self._images, self._labels, self._image_cls, self._ids, self._coords])
@@ -114,20 +118,15 @@ def shuffle_multiple(list_of_lists):
 def fetch_dataset(turtle, set_id, total_sets, augment):
 
   if set_id > -1:
-    items = turtle.get_set_patches(set_id, total_sets)
-
-    patches = [i.get_patch() for i in items]
-    coords = [i.coords for i in items]
-    classes = [i.label for i in items]
-    # label for the dataset now means array
-    labels = [i.get_label_array(len(turtle.label_map)) for i in items]
+    patches, coords, classes, labels = turtle.get_set_patches(set_id, total_sets)
 
     if augment:
       orig = np.copy(patches)
       if select_augment < 0:
         for j in range(1, 9):
           patches = np.concatenate((au.augment_patches(orig, j), patches), axis=0)
-        labels = np.tile(labels, (9, 1))
+        if labels != []:
+          labels = np.tile(labels, (9, 1))
         coords = np.tile(coords, (9, 1))
         classes = np.tile(classes, 9)
 
@@ -144,50 +143,47 @@ def read_datasets(turtle,
 					augment=True,
 					is_test=False):
 
-	class DataSets(object):
-		pass
-	dataset = DataSets()
+    class DataSets(object):
+        pass
+    dataset = DataSets()
+    if is_test:
+        dataset.test = fetch_dataset(turtle, -1, -1, False)
+    else:
+        dataset.train = fetch_dataset(turtle, set_id, total_sets, augment)
+        dataset.valid = fetch_dataset(turtle, valid_id, total_sets, augment)
+        if shuffle_all:
+            dataset.train.shuffle_all()
+            dataset.valid.shuffle_all()
+    
+    return dataset
 
-	if is_test:
-		dataset.test = fetch_dataset(turtle, -1, -1, False)
-	else:
-		dataset.train = fetch_dataset(turtle, set_id, total_sets, augment)
-		dataset.valid = fetch_dataset(turtle, valid_id, total_sets, augment)
-		if shuffle_all:
-			dataset.train.shuffle_all()
-			dataset.valid.shuffle_all()
 
-	return dataset
-
-
-def augment_patches(patches, set_id):
-	''' We want to augment the patches based on the set ID. 
+def augment_patches(patches, augment_id):
+	''' We want to augment the patches based on the augment_id. 
 	Three rotations:
 		A (90 degrees to the left)
 		B (180 degrees to the left)
 		C (270 degrees to the left)
 	'''
-
 	aug_patches = []
 	for im in patches:
-		if(set_id == 0): # normal
+		if(augment_id == 0): # normal
 			return patches
-		elif(set_id == 1): # horizontal mirror
+		elif(augment_id == 1): # horizontal mirror
 			aug_patches.append(np.fliplr(im))
-		elif(set_id == 2): # vertical mirror
+		elif(augment_id == 2): # vertical mirror
 			aug_patches.append(np.flipud(im))
-		elif(set_id == 3): # rotate A from 0
+		elif(augment_id == 3): # rotate A from 0
 			aug_patches.append(np.rot90(im, 1))
-		elif(set_id == 4): # rotate B from 0
+		elif(augment_id == 4): # rotate B from 0
 			aug_patches.append(np.rot90(im, 2))
-		elif(set_id == 5): # rotate C from 0
+		elif(augment_id == 5): # rotate C from 0
 			aug_patches.append(np.rot90(im, 3))
-		elif(set_id == 6): # rotate A from 1
+		elif(augment_id == 6): # rotate A from 1
 			aug_patches.append(np.rot90(np.fliplr(im), 1))
-		elif(set_id == 7): # rotate B from 1
+		elif(augment_id == 7): # rotate B from 1
 			aug_patches.append(np.rot90(np.fliplr(im), 2))
 		else: # rotate C from 1
 			aug_patches.append(np.rot90(np.fliplr(im), 3))
-
 	return np.array(aug_patches)
 
