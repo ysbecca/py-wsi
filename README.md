@@ -5,6 +5,10 @@
 
 **Notice: it is strongly recommended to use py-wsi version >= 1.0.**
 
+**If you download this project, please fork it!**
+
+**The next update will include: realistic H&E stain augmentations and the option to save to HDF5 files**
+
 The current update to py_wsi has added three major improvements which are essential for dealing with very large datasets of .svs images:
 
 - better memory management
