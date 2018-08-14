@@ -122,13 +122,12 @@ def fetch_dataset(turtle, set_id, total_sets, augment):
 
     if augment:
       orig = np.copy(patches)
-      if select_augment < 0:
-        for j in range(1, 9):
-          patches = np.concatenate((au.augment_patches(orig, j), patches), axis=0)
-        if labels != []:
-          labels = np.tile(labels, (9, 1))
-        coords = np.tile(coords, (9, 1))
-        classes = np.tile(classes, 9)
+      for j in range(1, 9):
+        patches = np.concatenate((augment_patches(orig, j), patches), axis=0)
+      if labels != []:
+        labels = np.tile(labels, (9, 1))
+      coords = np.tile(coords, (9, 1))
+      classes = np.tile(classes, 9)
 
     return DataSet(patches, labels, classes, coords)
   else:
