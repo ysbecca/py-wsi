@@ -3,7 +3,7 @@
 
 ## Current version
 
-**Notice: it is strongly recommended to use py-wsi version >= 1.0.**
+**Notice: it is strongly recommended to use py-wsi version >= 1.0 and to FORK and download this repository. This repo contains all the most recent features and fixes.**
 
 **If you download this project, please fork it!**
 
@@ -48,7 +48,7 @@ openslide-python 1.1.1
 brew install openslide
 ```
 
-2. Install py_wsi using pip.
+2. Fork and download this repository, then import into your working directory (highly recommended, since you will most likely want to customise and add extra features!) OR install py_wsi using pip.
 
 ```
 pip install py_wsi
