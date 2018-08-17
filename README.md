@@ -46,7 +46,8 @@ openslide-python 1.1.1
 brew install openslide
 ```
 
-2. Fork and download this repository, then import into your working directory (highly recommended, since you will most likely want to customise and add extra features!) OR install py_wsi using pip.
+2. **Fork and download this repository, then import into your working directory** (highly recommended, since you will most likely want to customise and add extra features!) OR install py_wsi using pip.
+
 
 ```
 pip install py_wsi
