@@ -218,7 +218,7 @@ class Turtle(object):
 		print("Setting patch size", patch_dim, "and tile size", tile_dim)
 
 		if not self.__check_file_found(file_name):
-			return (0, 0)
+			return [], [], []
 
 		slide = open_slide(self.file_dir + file_name) 
 		tiles = DeepZoomGenerator(slide, tile_size=tile_dim, overlap=overlap)
