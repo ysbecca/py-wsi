@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 def show_images(images, per_row, per_column):
     ''' Displays up to per_row*per_column images with per_row images per row, per_column images per column.
-	'''
+    '''
     fig = plt.figure(figsize=(25, 25))
     data = images[:(per_row*per_column)]
 
