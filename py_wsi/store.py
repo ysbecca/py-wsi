@@ -6,14 +6,21 @@ Author: @ysbecca
 
 
 '''
+import csv
 import time
+import h5py
 from datetime import timedelta
+
+from PIL import Image
 
 import lmdb
 import numpy as np
 from .item import *
 
-# OPTION 1) Store in a lightning memory-mapped database.
+
+###########################################################################
+#                Option 1: Save to LMDB                                   #
+###########################################################################
 
 def save_in_lmdb(env, patches, coords, file_name, labels=[]):
     use_label = False
@@ -63,16 +70,53 @@ def read_lmdb(location, name):
     return lmdb.open(name, readonly=True)
 
 
-# OPTION 2) Store in HDF5 files, multiple patches per file and accessible individually.
+###########################################################################
+#                Option 2: store to HDF5 files                            #
+###########################################################################
 
-# def store_hdf5():
+def save_to_hdf5(db_location, patches, coords, file_name, labels):
+    """ Saves the numpy arrays to HDF5 files. All patches from a single WSI will be saved
+        to the same HDF5 file, regardless of the transaction size specified by rows_per_txn,
+        because this is the most efficient way to use HDF5 datasets.
+        - db_location       folder to save images in
+        - patches           numpy images
+        - coords            x, y tile coordinates
+        - file_name         original source WSI name
+        - labels            patch labels (opt)
+    """
 
-# OPTION 3) Save patches to disk as .png files + a single meta-data file.
+    # Save patches into hdf5 file.
+    file    = h5py.File(db_location + file_name + '.h5','w')
+    dataset = file.create_dataset('t', np.shape(patches), h5py.h5t.STD_I32BE, data=patches)
 
-# def store_disk(dir):
+    # Save all label meta into a csv file.
+    with open(db_location + file_name + '.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=' ',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for i in range(len(labels)):
+            writer.writerow([coords[i][0], coords[i][1], labels[i]])
 
 
+###########################################################################
+#                Option 3: save patches to disk                           #
+###########################################################################
 
+def save_to_disk(db_location, patches, coords, file_name, labels):
+    """ Saves numpy patches to .png files (full resolution). 
+        Meta data is saved in the file name.
+        - db_location       folder to save images in
+        - patches           numpy images
+        - coords            x, y tile coordinates
+        - file_name         original source WSI name
+        - labels            patch labels (opt)
+    """
+    save_labels = len(labels)
+    for i, patch in enumerate(patches):
+        # Construct the new PNG filename
+        patch_fname = file_name + "_" + str(coords[i][0]) + "_" + str(coords[i][1]) + "_"
 
+        if save_labels:
+            patch_fname += str(labels[i])
 
-
+        # Save the image.
+        Image.fromarray(patch).save(db_location + patch_fname + ".png")

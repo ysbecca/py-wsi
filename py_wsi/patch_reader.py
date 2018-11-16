@@ -16,6 +16,8 @@ from shapely.geometry import Polygon, Point
 from .store import *
 
 def check_label_exists(label, label_map):
+    ''' Checking if a label is a valid label. 
+    '''
     if label in label_map:
         return True
     else:
@@ -25,8 +27,12 @@ def check_label_exists(label, label_map):
         return False
 
 def generate_label(regions, region_labels, point, label_map):
-    # regions = array of vertices (all_coords)
-    # point [x, y]
+    ''' Generates a label given an array of regions.
+        - regions               array of vertices
+        - region_labels         corresponding labels for the regions
+        - point                 x, y tuple
+        - label_map             the label dictionary mapping string labels to integer labels
+    '''
     for i in range(len(region_labels)):
         poly = Polygon(regions[i])
         if poly.contains(Point(point[0], point[1])):
@@ -34,6 +40,7 @@ def generate_label(regions, region_labels, point, label_map):
                 return label_map[region_labels[i]]
             else:
                 return -1
+    # By default, we set to "Normal" if it exists in the label map.
     if check_label_exists('Normal', label_map):
         return label_map['Normal']
     else:
@@ -67,32 +74,41 @@ def get_regions(path):
 def patch_to_tile_size(patch_size, overlap):
     return patch_size - overlap*2
 
-def sample_and_store_patches_by_row(
-                                file_name,
-                                file_dir,
-                                pixel_overlap,
-                                env,
-                                meta_env,
-                                patch_size=512,
-                                level=0,
-                                image_id=False,
-                                xml_dir=False,
-                                label_map={},
-                                limit_bounds=True,
-                                rows_per_txn=20,
-                                ):
+def sample_and_store_patches(file_name,
+                             file_dir,
+                             pixel_overlap,
+                             env=False,
+                             meta_env=False,
+                             patch_size=512,
+                             level=0,
+                             xml_dir=False,
+                             label_map={},
+                             limit_bounds=True,
+                             rows_per_txn=20,
+                             db_location='',
+                             prefix='',
+                             storage_option='lmdb'):
     ''' Sample patches of specified size from .svs file.
-        - pixel_overlap: pixels overlap on each side
-        - level: 0 is lowest resolution; level_count - 1 is highest
+        - file_name             name of whole slide image to sample from
+        - file_dir              directory file is located in
+        - pixel_overlap         pixels overlap on each side
+        - env, meta_env         for LMDB only; environment variables
+        - level                 0 is lowest resolution; level_count - 1 is highest
+        - xml_dir               directory containing annotation XML files
+        - label_map             dictionary mapping string labels to integers
+        - rows_per_txn          how many patches to load into memory at once
+        - storage_option        the patch storage option              
 
         Note: patch_size is the dimension of the sampled patches, NOT equivalent to openslide's definition
         of tile_size. This implementation was chosen to allow for more intuitive usage.
     '''
 
     tile_size = patch_to_tile_size(patch_size, pixel_overlap)
-
     slide = open_slide(file_dir + file_name)
-    tiles = DeepZoomGenerator(slide, tile_size=tile_size, overlap=pixel_overlap, limit_bounds=limit_bounds)
+    tiles = DeepZoomGenerator(slide,
+                              tile_size=tile_size,
+                              overlap=pixel_overlap,
+                              limit_bounds=limit_bounds)
 
     if xml_dir:
         # Expect filename of XML annotations to match SVS file name
@@ -123,11 +139,27 @@ def sample_and_store_patches_by_row(
             x += 1
 
         # To save memory, we will save data into the dbs every rows_per_txn rows. i.e., each transaction will commit
-        # rows_per_txn rows of patches. Write after last row regardless.
+        # rows_per_txn rows of patches. Write after last row regardless. HDF5 does NOT follow
+        # this convention due to efficiency.
         if (y % rows_per_txn == 0 and y != 0) or y == y_tiles-1:
-            save_in_lmdb(env, patches, coords, file_name[:-4], labels)
+            if storage_option == 'disk':
+                save_to_disk(db_location, patches, coords, file_name[:-4], labels)
+            elif storage_option == 'lmdb':
+                # LMDB by default.
+                save_in_lmdb(env, patches, coords, file_name[:-4], labels)
+            if storage_option != 'hdf5':
+                del patches
+                del coords
+                del labels
+                patches, coords, labels = [], [], [] # Reset right away.
+
+        # Write to HDF5 files all in one go.
+        if storage_option == 'hdf5':
+            save_to_hdf5(db_location, patches, coords, file_name[:-4], labels)
+
+        # Need to save tile dimensions if LMDB for retrieving patches by key.
+        if storage_option == 'lmdb':
             save_meta_in_lmdb(meta_env, file_name[:-4], [x_tiles, y_tiles])
-            patches, coords, labels = [], [], [] # Reset right away.
 
         y += 1
         x = 0
