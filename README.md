@@ -36,7 +36,7 @@ Lim et al. in "[An analysis of image storage systems for scalable training of de
 You can read about the various supported formats and their Python libraries here:
 
 - [LMDB Python binding docs](https://lmdb.readthedocs.io/en/release/)
-- [HDF5 for Python (h5py)[https://www.h5py.org/]
+- [HDF5 for Python (h5py)](https://www.h5py.org/)
 
 py-wsi uses OpenSlide Python. According to the [Python OpenSlide website](http://openslide.org/api/python/), "OpenSlide is a C library that provides a simple interface for reading whole-slide images, also known as virtual slides, which are high-resolution images used in digital pathology. These images can occupy tens of gigabytes when uncompressed, and so cannot be easily read using standard tools or libraries, which are designed for images that can be comfortably uncompressed into RAM. Whole-slide images are typically multi-resolution; OpenSlide allows reading a small amount of image data at the resolution closest to a desired zoom level."
 
