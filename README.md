@@ -15,7 +15,7 @@ This update to py_wsi has added two new functionalities:
 
 For those using older versions of py_wsi with LMDB storage: this updated version is backwards compatible and your old code will not be affected. Not changing the function signatures turned out tricky -- I should have thought out the code structure more carefully for the initial LMDB version, so apologies for those who dive into the code. There are plenty of comments for those who want to tweak things.
 
-**Check Jupyter Notebook on GitHub to view example usage:**[Example usage of py-wsi](https://github.com/ysbecca/py-wsi/blob/master/Using%20py-wsi.ipynb)
+**Check Jupyter Notebook on GitHub to view example usage:** [Example usage of py-wsi](https://github.com/ysbecca/py-wsi/blob/master/Using%20py-wsi.ipynb)
 
 
 2.0 Overview
@@ -44,14 +44,14 @@ py-wsi uses OpenSlide Python. According to the [Python OpenSlide website](http:/
 
 This library was built using the following, but may be compatible with previous versions:
 
-python==3.6.1
-numpy==1.15.2
-lmdb==0.93
-openslide-python==1.1.1
-Shapely==1.6.4
-h5py==2.7.0
+python==3.6.1  
+numpy==1.15.2  
+lmdb==0.93  
+openslide-python==1.1.1  
+Shapely==1.6.4  
+h5py==2.7.0  
 
-1. Check dependencies listed in above and in setup.py; notably, openslide-python which requires openslide, lmdb, and h5py. The python geometry package Shapely is used for inferring labels from XML annotations.
+1. Check dependencies listed in above and in setup.py; notably, openslide, openslide-python, lmdb, and h5py. The python geometry package Shapely is used for inferring labels from XML annotations.
 
 ```
 brew install openslide
