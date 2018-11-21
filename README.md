@@ -5,6 +5,8 @@ It is strongly recommended to use py-wsi version >= 1.0 and to fork and download
 
 Please feel free to submit any issues to the GitHub repository and I will provide help as I am able to. While suggestions for extra/additional functionality will not be immediately considered, **pull requests are welcome.**
 
+If you use py-wsi in any published work, please credit Rebecca Stone.
+
 1.0 Current version (py-wsi 2.0): HDF5 and saving patches to disk
 ---------------------------------------------------------
 
