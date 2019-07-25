@@ -13,7 +13,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='py_wsi',
-      version='1.1',
+      version='2.1',
       description=description,
       long_description=long_description,
       url='https://github.com/ysbecca/py-wsi',
@@ -27,6 +27,7 @@ setup(name='py_wsi',
           'openslide-python',
           'lmdb',
           'Pillow',
+          'h5py',
       ],
       keywords='whole slide images svs openslide lmdb machine learning', 
       zip_safe=False)

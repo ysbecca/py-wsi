@@ -67,7 +67,7 @@ def print_lmdb_keys(env):
 
 def read_lmdb(location, name):
     ''' Read-only allows for multiple consecutive reads. '''
-    return lmdb.open(name, readonly=True)
+    return lmdb.open(location + name, readonly=True)
 
 
 ###########################################################################
