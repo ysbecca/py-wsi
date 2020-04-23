@@ -153,15 +153,15 @@ def sample_and_store_patches(file_name,
                 del labels
                 patches, coords, labels = [], [], [] # Reset right away.
 
-        # Write to HDF5 files all in one go.
-        if storage_option == 'hdf5':
-            save_to_hdf5(db_location, patches, coords, file_name[:-4], labels)
-
-        # Need to save tile dimensions if LMDB for retrieving patches by key.
-        if storage_option == 'lmdb':
-            save_meta_in_lmdb(meta_env, file_name[:-4], [x_tiles, y_tiles])
-
         y += 1
         x = 0
+
+    # Write to HDF5 files all in one go.
+    if storage_option == 'hdf5':
+        save_to_hdf5(db_location, patches, coords, file_name[:-4], labels)
+
+    # Need to save tile dimensions if LMDB for retrieving patches by key.
+    if storage_option == 'lmdb':
+        save_meta_in_lmdb(meta_env, file_name[:-4], [x_tiles, y_tiles])
 
     return count
