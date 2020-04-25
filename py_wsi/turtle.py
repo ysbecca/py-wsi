@@ -27,6 +27,7 @@ class Turtle(object):
 
     def __init__(self,
     			 file_dir,
+                 wsi_type,
     			 db_location,
     			 db_name="",
     			 storage_type='lmdb',
@@ -36,6 +37,7 @@ class Turtle(object):
         """ The py-wsi manager class for manipulating svs and patches. 
             - storage_type  expecting 'lmdb', 'hdf5', disk'
             - file_dir      location of all the image files
+            - wsi_types     type of wsi files stored, can be any supported by openslide
             - db_location   path where images will be stored
             - db_name       name of database (name for LMDB; prefix of files for HDF5 and disk)
             - xml_dir       path of XML annoation files, if used
@@ -46,6 +48,7 @@ class Turtle(object):
             return
 
         self.storage_type = storage_type
+        self.wsi_type = wsi_type
 
         # Path to storage directories
         self.file_dir = file_dir
@@ -56,7 +59,7 @@ class Turtle(object):
         self.db_meta_name = self.__get_db_meta_name(db_name)
 
         # Links to the image filenames
-        self.files = self.__get_files_from_dir(file_dir)
+        self.files = self.__get_files_from_dir(file_dir, file_type=self.wsi_type)
         self.num_files = len(self.files)
 
         # Annotation details
@@ -238,14 +241,14 @@ class Turtle(object):
     def set_file_dir(self, file_dir):
         self.file_dir = file_dir
         # Update the files list and the total number of files.
-        self.files = self.__get_files_from_dir(file_dir)
+        self.files = self.__get_files_from_dir(file_dir, file_type=self.wsi_type)
         self.num_files = len(self.files)
 
     def set_xml_dir(self, xml_dir):
         self.xml_dir = xml_dir
 
     def get_xml_files(self):
-        return self.__get_files_from_dir(self.xml_dir, '.xml')
+        return self.__get_files_from_dir(self.xml_dir, file_type='.xml')
 
     def set_db_location(self, db_location):
         self.db_location = db_location
@@ -258,8 +261,8 @@ class Turtle(object):
     #                General class helper functions                           #
     ###########################################################################
 
-    def __get_files_from_dir(self, file_dir, file_type='.svs'):
-        """ Returns the names of all the SVS image files in the provided directory. 
+    def __get_files_from_dir(self, file_dir, file_type):
+        """ Returns the names of all the image files based on type in the provided directory.
         """
         return np.array([file for file in listdir(file_dir) 
             if isfile(join(file_dir, file)) and file_type in file])
